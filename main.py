@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
 # Pydantic
 from pydantic import BaseModel
 from pydantic import Field
@@ -39,8 +39,17 @@ class User(UserBase):
 
 
 class Tweet(BaseModel):
-    pass
-
+    tweet_id: UUID = Field(...)
+    content: str = Field(
+        ...,
+        min_length=1,
+        max_length=256
+    )
+    created_at: datetime = Field(
+        default=datetime.now()
+    )
+    updated_at: Optional[datetime] = Field(default=None)
+    owner: User = Field(...)
 
 # Endpoints
 @app.get(
