@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 # Pydantic
 from pydantic import BaseModel
@@ -51,7 +51,7 @@ class Tweet(BaseModel):
     updated_at: Optional[datetime] = Field(default=None)
     owner: User = Field(...)
 
-# Endpoints
+# Path Operations
 @app.get(
     path='/',
     status_code=status.HTTP_200_OK,
@@ -63,3 +63,73 @@ async def home():
             'status': 'working'
         }
     }
+
+## Users
+@app.post(
+    path='/users',
+    response_model=User,
+    status_code=status.HTTP_201_CREATED,
+    summary='Register a User',
+    tags=['Users']
+)
+async def signup():
+    pass
+
+
+@app.post(
+    path='/login',
+    response_model=User,
+    status_code=status.HTTP_200_OK,
+    summary='Login a User',
+    tags=['Users']
+)
+async def login():
+    pass
+
+
+@app.get(
+    path='/users',
+    response_model=List[User],
+    status_code=status.HTTP_200_OK,
+    summary='Show all users',
+    tags=['Users']
+)
+async def show_all_users():
+    pass
+
+
+@app.get(
+    path='/users/{user_id}',
+    response_model=User,
+    status_code=status.HTTP_200_OK,
+    summary='Show a User',
+    tags=['Users']
+)
+async def show_user_detail():
+    pass
+
+
+@app.put(
+    path='/users/{user_id}/update',
+    response_model=User,
+    status_code=status.HTTP_200_OK,
+    summary='Update a User',
+    tags=['Users']
+)
+async def update_an_user():
+    pass
+
+
+@app.delete(
+    path='/users/{user_id}/delete',
+    response_model=User,
+    status_code=status.HTTP_200_OK,
+    summary='Delete a User',
+    tags=['Users']
+)
+async def delete_an_user():
+    pass
+
+
+
+## Tweets
