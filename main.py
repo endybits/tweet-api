@@ -1,6 +1,8 @@
 from uuid import UUID
+import json
 from typing import Optional, List
 from datetime import date, datetime
+
 # Pydantic
 from pydantic import BaseModel
 from pydantic import Field
@@ -9,6 +11,7 @@ from pydantic import EmailStr
 # FastAPI
 from fastapi import FastAPI
 from fastapi import status
+from fastapi import Body
 
 app = FastAPI()
 
@@ -28,15 +31,23 @@ class User(UserBase):
     first_name: str = Field(
         ...,
         min_length=1,
-        max_length=50
+        max_length=50,
+        example='Endy'
     )
     last_name: str = Field(
         ...,
         min_length=1,
-        max_length=50
+        max_length=50,
+        example='Bermudez'
     )
-    birth_day: Optional[date] = Field(default=None)
+    birth_date: Optional[date] = Field(default=None)
 
+class UserRegister(User):
+    password: str = Field(
+        ...,
+        min_length=8,
+        max_length=64
+    )
 
 class Tweet(BaseModel):
     tweet_id: UUID = Field(...)
@@ -125,8 +136,36 @@ async def delete_a_tweet():
     summary='Register a User',
     tags=['Users']
 )
-async def signup():
-    pass
+async def signup(
+    user: UserRegister = Body(...)
+):
+    """
+        Signup a user
+
+        This path operation register a user in the app.
+        
+        Parameters:
+        - Request body parameter
+            - user: UserRegister
+        
+        Returns a json with the basic user information:
+        - user_id: UUID
+        - email: EmailStr
+        - first_name: str
+        - last_name: str
+        - birth_date: date
+    """
+    with open('users.json', 'r+', encoding='utf-8') as f:
+        results = f.read()
+        results = json.loads(results)
+        user_dict = user.dict()
+        user_dict['user_id'] = str(user_dict.get('user_id'))
+        user_dict['birth_date'] = str(user_dict.get('birth_date'))
+        results.append(user_dict)
+        results = json.dumps(results)
+        f.seek(0)
+        f.write(results)
+        return user
 
 ### Login a user
 @app.post(
