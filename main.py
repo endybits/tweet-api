@@ -75,11 +75,13 @@ class Tweet(BaseModel):
     tags=['Tweets']
 )
 async def home():
-    return {
-        'Twitter API': {
-            'status': 'working'
+    with open('tweets.json', 'r+', encoding='utf-8') as f:
+        tweets = f.read()
+        tweets = json.loads(tweets)
+
+        return {
+            'Tweets': tweets
         }
-    }
 
 ### Create a tweet
 @app.post(
@@ -89,8 +91,42 @@ async def home():
     summary='Post a Tweet',
     tags=['Tweets']
 )
-async def post_tweet():
-    pass
+async def post_tweet(
+    tweet: Tweet = Body(...)
+):
+    """
+        Post a Tweet
+
+        This path operation allows users to post their tweets in the app.
+        
+        Parameters:
+        - Request body parameter
+            - user: Tweet
+        
+        Returns a json with the basic user information:
+        - tweet_id: UUID
+        - content: str
+        - created_at: datetime
+        - updated_at: Optional[datetime]
+        - owner: User
+    """
+    with open('tweets.json', 'r+', encoding='utf-8') as f:
+        tweets_list = f.read()
+        tweets_list = json.loads(tweets_list)
+        tweet_dict = tweet.dict()
+        tweet_dict['tweet_id'] = str(tweet_dict.get('tweet_id'))
+        tweet_dict['created_at'] = str(tweet_dict.get('created_at'))
+        tweet_dict['updated_at'] = str(tweet_dict.get('updated_at'))
+        tweet_dict['owner']['user_id'] = str(tweet_dict['owner']['user_id']) 
+        tweet_dict['owner']['birth_date'] = str(tweet_dict['owner']['birth_date']) 
+        tweets_list.append(tweet_dict)
+        tweets_list = json.dumps(tweets_list)
+        f.seek(0)
+        f.write(tweets_list)
+        return tweet_dict
+
+
+
 
 ### Show a tweet
 @app.get(
