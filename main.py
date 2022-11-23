@@ -69,7 +69,7 @@ class Tweet(BaseModel):
 ### Show all tweets
 @app.get(
     path='/',
-    response_model=List[Tweet],
+    #response_model=List[Tweet],
     status_code=status.HTTP_200_OK,
     summary='Show all tweets',
     tags=['Tweets']
@@ -187,7 +187,24 @@ async def login():
     tags=['Users']
 )
 async def show_all_users():
-    pass
+    """
+        Show all users
+
+        This path operation show all users registered in users.json
+        
+        Parameters: None
+        
+        Returns a json list with the basic user information for each item:
+        - user_id: UUID
+        - email: EmailStr
+        - first_name: str
+        - last_name: str
+        - birth_date: date
+    """
+    with open('users.json', 'r', encoding='utf-8') as f:
+        results = f.read()
+        results = json.loads(results)
+    return results
 
 ### Show user detail
 @app.get(
